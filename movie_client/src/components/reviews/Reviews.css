@@ -1,0 +1,65 @@
+.review-container {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.review-username {
+    color: gold;
+    font-weight: bold;
+}
+
+.review-body {
+    color: #ccc;
+    line-height: 1.5;
+}
+
+.delete-review {
+    background-color: transparent;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.delete-review:hover {
+    background-color: #ff4444;
+    color: white;
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 1rem;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    color: #ccc;
+}
+
+.login-prompt a {
+    color: gold;
+    text-decoration: none;
+}
+
+.login-prompt a:hover {
+    text-decoration: underline;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 2rem;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    color: #ccc;
+    font-style: italic;
+    margin-top: 1rem;
+} 
