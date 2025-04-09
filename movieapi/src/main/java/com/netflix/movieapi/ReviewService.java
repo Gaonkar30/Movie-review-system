@@ -1,6 +1,8 @@
 package com.netflix.movieapi;
 
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -8,68 +10,54 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class ReviewService {
+    private static final Logger logger = LoggerFactory.getLogger(ReviewService.class);
+    
     @Autowired
     private ReviewRepository reviewRepository;
     @Autowired
     private MongoTemplate mongoTemplate; // to talk to database
 
     public Review CreateReview(String reviewBody, String imdbId, String username) {
-        Review review = reviewRepository.insert(new Review(reviewBody, username));
+        logger.info("Creating review for movie: {} by user: {}", imdbId, username);
+        
+        // Create and save the review first to get its ID
+        Review review = new Review(reviewBody, username);
+        Review savedReview = reviewRepository.insert(review);
+        logger.info("Created review with ID: {}", savedReview.getId());
+        
+        // Update the movie with the review's ObjectId
         mongoTemplate.update(Movie.class)
                 .matching(Criteria.where("imdbId").is(imdbId))
-                .apply(new Update().push("reviewIds").value(review.getId()))
+                .apply(new Update().push("reviewIds").value(savedReview.getId()))
                 .first();
-        return review;
+        logger.info("Added review ID to movie: {}", imdbId);
+        
+        return savedReview;
     }
 
-    public List<Review> getReviewsByMovieId(String imdbId) {
-        Movie movie = mongoTemplate.findOne(
-                Query.query(Criteria.where("imdbId").is(imdbId)),
-                Movie.class
-        );
-
-        if (movie != null && movie.getReviewIds() != null && !movie.getReviewIds().isEmpty()) {
-            // Extract the IDs from the Review objects
-            List<ObjectId> reviewObjectIds = movie.getReviewIds().stream()
-                    .map(Review::getId)
-                    .toList();
-
-            // Now use the extracted IDs to fetch the reviews
-            return reviewRepository.findAllById(reviewObjectIds);
-        }
-        return List.of();
-    }
-
-    public boolean isReviewOwner(String reviewId, String username) {
+    public void deleteReview(String reviewId, String imdbId) {
+        logger.info("Starting delete process for review ID: {} from movie: {}", reviewId, imdbId);
+        
         try {
-            ObjectId reviewObjectId = new ObjectId(reviewId);
-            Optional<Review> review = reviewRepository.findById(reviewObjectId);
-            return review.map(r -> r.getUsername().equals(username)).orElse(false);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    public void deleteReview(String reviewId) {
-        try {
-            ObjectId reviewObjectId = new ObjectId(reviewId);
+            // Convert String ID to ObjectId
+            ObjectId objectId = new ObjectId(reviewId);
+            logger.info("Converted review ID to ObjectId: {}", objectId);
             
-            // Remove the review reference from the movie
-            mongoTemplate.updateMulti(
-                Query.query(Criteria.where("reviewIds").is(reviewObjectId)),
-                new Update().pull("reviewIds", reviewObjectId),
-                Movie.class
-            );
-
-            // Delete the review
-            reviewRepository.deleteById(reviewObjectId);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid review ID format");
+            // Delete the review from the reviews collection
+            reviewRepository.deleteById(objectId);
+            logger.info("Deleted review from reviews collection");
+            
+            // Remove the review ID from the movie's reviewIds array
+            mongoTemplate.update(Movie.class)
+                    .matching(Criteria.where("imdbId").is(imdbId))
+                    .apply(new Update().pull("reviewIds", objectId))
+                    .first();
+            logger.info("Removed review ID from movie's reviewIds array");
+        } catch (Exception e) {
+            logger.error("Error in deleteReview: {}", e.getMessage(), e);
+            throw e;
         }
     }
 }

@@ -1,5 +1,5 @@
 .movie-page {
-    padding: 0rem;
+    padding: 2rem;
 }
 
 .admin-controls {
@@ -40,7 +40,7 @@
 }
 
 .movie-poster {
-    width: 0%;
+    width: 100%;
     height: auto;
     object-fit: cover;
 }

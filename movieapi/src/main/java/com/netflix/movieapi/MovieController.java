@@ -11,25 +11,31 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/movies")
+@CrossOrigin(origins = "http://localhost:5173")
 public class MovieController {
     @Autowired
     private MovieService movieService;
-    @CrossOrigin(origins = "http://localhost:5173")
+
     @GetMapping
-    public ResponseEntity<List<Movie>> getMovies(){
-        return new ResponseEntity<List<Movie>>(movieService.findAllMovies(),HttpStatus.OK);
+    public ResponseEntity<List<Movie>> getMovies() {
+        return new ResponseEntity<List<Movie>>(movieService.findAllMovies(), HttpStatus.OK);
     }
-    @CrossOrigin(origins = "http://localhost:5173")
+
     @GetMapping("/{imdbid}")
-    public ResponseEntity<Optional<Movie>> getSingleMovie(@PathVariable String imdbid){
-        return new ResponseEntity<Optional<Movie>>(movieService.singleMovie(imdbid),HttpStatus.OK);
+    public ResponseEntity<Optional<Movie>> getSingleMovie(@PathVariable String imdbid) {
+        return new ResponseEntity<Optional<Movie>>(movieService.singleMovie(imdbid), HttpStatus.OK);
     }
-    @CrossOrigin(origins = "http://localhost:5173")
+
+    @GetMapping("/{imdbid}/reviews")
+    public ResponseEntity<List<Review>> getMovieReviews(@PathVariable String imdbid) {
+        return new ResponseEntity<List<Review>>(movieService.getReviewsForMovie(imdbid), HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
         return new ResponseEntity<Movie>(movieService.createMovie(movie), HttpStatus.CREATED);
     }
-    @CrossOrigin(origins = "http://localhost:5173")
+
     @DeleteMapping("/{imdbid}")
     public ResponseEntity<Void> deleteMovie(@PathVariable String imdbid) {
         movieService.deleteMovie(imdbid);

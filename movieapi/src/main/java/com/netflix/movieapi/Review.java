@@ -41,6 +41,10 @@ public class Review {
         return id;
     }
 
+    public String getIdString() {
+        return id != null ? id.toString() : null;
+    }
+
     public void setId(ObjectId id) {
         this.id = id;
     }

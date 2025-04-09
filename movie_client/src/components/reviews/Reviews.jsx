@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef} from 'react';
 import api from '../../api/axiosConfig';
 import {useParams} from 'react-router-dom';
 import {Container, Row, Col} from 'react-bootstrap';
@@ -8,62 +8,52 @@ import './Reviews.css';
 
 import React from 'react'
 
-const Reviews = ({getMovieData,movie,setReviews}) => {
+const Reviews = ({getMovieData,movie,reviews,setReviews}) => {
 
     const revText = useRef();
     const params = useParams();
     const movieId = params.movieId;
     const {user} = useAuth();
-    const [reviews, setLocalReviews] = useState([]);
 
-    useEffect(()=>{
+    useEffect(() => {
+        console.log('Fetching movie data for ID:', movieId);
         getMovieData(movieId);
-        fetchReviews();
-    },[movieId])
+    }, []);
 
-    const fetchReviews = async () => {
-        try {
-            const response = await api.get(`/api/v1/reviews/movie/${movieId}`);
-            setLocalReviews(response.data);
-            setReviews(response.data);
-        } catch (error) {
-            console.error('Error fetching reviews:', error);
-        }
-    };
+    useEffect(() => {
+        console.log('Current reviews:', reviews);
+    }, [reviews]);
 
     const addReview = async (e) => {
         e.preventDefault();
         const rev = revText.current;
     
         try {
-            // Send the review data to the API
+            console.log('Sending review:', { reviewBody: rev.value, imdbId: movieId });
             const response = await api.post("/api/v1/reviews", {
                 reviewBody: rev.value,
                 imdbId: movieId
             });
+            console.log('Review created:', response.data);
     
-            // Extract the newly created review from the API response
             const updatedReviews = [...reviews, response.data];
-    
-            // Clear the input field
             rev.value = "";
-    
-            // Update the state
-            setLocalReviews(updatedReviews);
             setReviews(updatedReviews);
         } catch (err) {
-            console.error(err);
+            console.error('Error creating review:', err);
         }
     };
     
     const handleDeleteReview = async (reviewId) => {
+        console.log('Attempting to delete review:', reviewId);
         try {
-            // Convert ObjectId to string if it's an object
-            const id = reviewId.toString();
-            await api.delete(`/api/v1/reviews/${id}`);
-            const updatedReviews = reviews.filter(r => r.id !== reviewId);
-            setLocalReviews(updatedReviews);
-            setReviews(updatedReviews);
+            // Convert the review ID to string if it's an object
+            const reviewIdString = typeof reviewId === 'object' ? reviewId.$oid || reviewId.toString() : reviewId;
+            await api.delete(`/api/v1/reviews/${reviewIdString}?imdbId=${movieId}`);
+            console.log('Review deleted successfully');
+            
+            // After successful deletion, fetch fresh data
+            getMovieData(movieId);
         } catch (err) {
             console.error('Error deleting review:', err);
         }
@@ -96,12 +86,15 @@ const Reviews = ({getMovieData,movie,setReviews}) => {
                 {
                     reviews && reviews.length > 0 ? (
                         reviews.map((r) => {
+                            console.log('Rendering review:', r);
                             return(
                                 <div key={r.id} className="review-container">
                                     <div className="review-header">
-                                        <span className="review-username">{r.username}</span>
+                                        <div className="review-user-info">
+                                            <span className="review-username">{r.username || 'Anonymous'}</span>
+                                        </div>
                                         {user && user.username === r.username && (
-                                            <button className="delete-review" onClick={() => handleDeleteReview(r.id)}>
+                                            <button className="delete-review" onClick={() => handleDeleteReview(r.idString || r.id)}>
                                                 Delete
                                             </button>
                                         )}
@@ -112,7 +105,7 @@ const Reviews = ({getMovieData,movie,setReviews}) => {
                             )
                         })
                     ) : (
-                        <div className="no-reviews">No reviews yet. Be the first to review!</div>
+                        <div className="no-reviews">No reviews yet. Be the first to review this movie!</div>
                     )
                 }
             </Col>

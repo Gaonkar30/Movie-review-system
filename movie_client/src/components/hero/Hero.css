@@ -37,6 +37,8 @@
     color:white;
     display: flex;
     align-items: center;
+    margin-right: 5rem;
+    width: 15rem;
 }
 
 .movie-buttons-container{

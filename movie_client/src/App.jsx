@@ -34,28 +34,38 @@ function App() {
 
   const getMovies = async () => {
     try {
+      console.log('Fetching all movies');
       const response = await api.get("/api/v1/movies");
+      console.log('Movies fetched:', response.data);
       setMovies(response.data);
     } catch(err) {
-      console.log(err);
+      console.error('Error fetching movies:', err);
     }
   }
 
   const getMovieData = async (movieId) => {
     try {
-      const response = await api.get(`/api/v1/movies/${movieId}`);
-      const singleMovie = response.data;
+      console.log('Fetching movie data for ID:', movieId);
+      const movieResponse = await api.get(`/api/v1/movies/${movieId}`);
+      const singleMovie = movieResponse.data;
+      console.log('Movie data fetched:', singleMovie);
       setMovie(singleMovie);
-      setReviews(singleMovie.reviews || []);
+      
+      // Fetch reviews separately
+      console.log('Fetching reviews for movie:', movieId);
+      const reviewsResponse = await api.get(`/api/v1/movies/${movieId}/reviews`);
+      console.log('Reviews fetched:', reviewsResponse.data);
+      setReviews(reviewsResponse.data);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching movie data:', error);
     }
   }
 
   const deleteMovie = async (imdbId) => {
     try {
+      console.log('Deleting movie:', imdbId);
       await api.delete(`/api/v1/movies/${imdbId}`);
-      // Refresh the movies list after deletion
+      console.log('Movie deleted successfully');
       getMovies();
     } catch (error) {
       console.error('Error deleting movie:', error);
@@ -86,7 +96,11 @@ function App() {
             <Route path="/Trailer/:ytTrailerId" element={<Trailer/>}/>
             <Route 
               path="/Reviews/:movieId" 
-              element={<Reviews getMovieData={getMovieData} movie={movie} reviews={reviews} setReviews={setReviews} />}
+              element={
+                <ProtectedRoute>
+                  <Reviews getMovieData={getMovieData} movie={movie} reviews={reviews || []} setReviews={setReviews} />
+                </ProtectedRoute>
+              }
             />
           </Route>
         </Routes>

@@ -13,12 +13,6 @@ const Header = () => {
             </div>
             <div className="nav-links">
                 <Link to="/">Home</Link>
-                {/* {user && (
-                    <>
-                        <Link to="/Trailer">Trailer</Link>
-                        <Link to="/Reviews">Reviews</Link>
-                    </>
-                )} */}
             </div>
             <div className="auth-controls">
                 {user ? (

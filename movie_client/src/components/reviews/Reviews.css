@@ -1,35 +1,49 @@
 .review-container {
     margin-bottom: 1.5rem;
-    padding: 1rem;
+    padding: 1.5rem;
     background-color: #1a1a1a;
     border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .review-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #333;
+}
+
+.review-user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .review-username {
     color: gold;
     font-weight: bold;
+    font-size: 1.1rem;
+    text-transform: capitalize;
 }
 
 .review-body {
     color: #ccc;
-    line-height: 1.5;
+    line-height: 1.6;
+    font-size: 1rem;
+    margin-top: 0.5rem;
 }
 
 .delete-review {
     background-color: transparent;
     border: 1px solid #ff4444;
     color: #ff4444;
-    padding: 0.3rem 0.8rem;
+    padding: 0.4rem 1rem;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
+    font-size: 0.9rem;
 }
 
 .delete-review:hover {
@@ -39,15 +53,17 @@
 
 .login-prompt {
     text-align: center;
-    padding: 1rem;
+    padding: 1.5rem;
     background-color: #1a1a1a;
     border-radius: 8px;
     color: #ccc;
+    margin-bottom: 1rem;
 }
 
 .login-prompt a {
     color: gold;
     text-decoration: none;
+    font-weight: bold;
 }
 
 .login-prompt a:hover {
@@ -61,5 +77,10 @@
     border-radius: 8px;
     color: #ccc;
     font-style: italic;
-    margin-top: 1rem;
+    margin: 1rem 0;
+}
+
+hr {
+    border-color: #333;
+    margin: 1.5rem 0;
 } 

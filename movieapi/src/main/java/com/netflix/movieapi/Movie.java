@@ -1,26 +1,28 @@
 package com.netflix.movieapi;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.util.List;
 
 @Document(collection = "movies")
 public class Movie {
-    public ObjectId getId() {
-        return id;
-    }
+    @Id
+    private ObjectId id;
+    private String imdbId;
+    private String title;
+    private String releaseDate;
+    private String trailerLink;
+    private String poster;
+    private List<String> genres;
+    private List<String> backdrops;
+    private List<ObjectId> reviewIds;  // Store ObjectIds for reviews
 
     public Movie() {
     }
 
-    public Movie(ObjectId id, String imdbId, String title, String releaseDate, String trailerLink, String poster, List<String> genres, List<String> backdrops, List<Review> reviewIds) {
-        this.id = id;
+    public Movie(String imdbId, String title, String releaseDate, String trailerLink, String poster, List<String> genres, List<String> backdrops) {
         this.imdbId = imdbId;
         this.title = title;
         this.releaseDate = releaseDate;
@@ -28,7 +30,10 @@ public class Movie {
         this.poster = poster;
         this.genres = genres;
         this.backdrops = backdrops;
-        this.reviewIds = reviewIds;
+    }
+
+    public ObjectId getId() {
+        return id;
     }
 
     public void setId(ObjectId id) {
@@ -91,23 +96,11 @@ public class Movie {
         this.backdrops = backdrops;
     }
 
-    public List<Review> getReviewIds() {
+    public List<ObjectId> getReviewIds() {
         return reviewIds;
     }
 
-    public void setReviewIds(List<Review> reviewIds) {
+    public void setReviewIds(List<ObjectId> reviewIds) {
         this.reviewIds = reviewIds;
     }
-
-    @Id
-    private ObjectId id;
-    private String imdbId;
-    private String title;
-    private String releaseDate;
-    private String trailerLink;
-    private String poster;
-    private List<String> genres;
-    private List<String> backdrops;
-    @DocumentReference
-    private List<Review> reviewIds;
 }
