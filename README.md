@@ -1,7 +1,3 @@
-Here’s a clean, professional README for your **Cinema Critic System** project — excluding individual member contributions as you asked:
-
----
-
 # 🎬 Movie-review-System
 
 > A modern movie review and management platform built using **React** for the frontend and **Spring Boot** with **MongoDB** for the backend.
